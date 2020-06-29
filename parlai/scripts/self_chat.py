@@ -106,8 +106,8 @@ def self_chat(opt):
         # self chat with same model
         agent2 = agent1.clone()
         # Set IDs
-        agent1.id = agent1.id + "_1"
-        agent2.id = agent1.id + "_2"
+        agent1.id = model_id + "_1"
+        agent2.id = model_id + "_2"
 
     world = create_task(opt, user_agents=[agent1, agent2])
 
