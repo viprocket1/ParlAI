@@ -64,7 +64,7 @@ def setup_args(parser=None):
         '-p',
         '--partner',
         default=None,
-        help="Define a different partner for self chat',
+        help='Define a different partner for self chat',
     )
     parser.set_defaults(interactive_mode=True, task='self_chat')
     WorldLogger.add_cmdline_args(parser)
