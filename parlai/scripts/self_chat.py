@@ -60,6 +60,12 @@ def setup_args(parser=None):
         choices=['conversations', 'parlai'],
         help='Format to save logs in. conversations is a jsonl format, parlai is a text format.',
     )
+    parser.add_argument(
+        '-p',
+        '--partner',
+        default=None,
+        help="Define a different partner for self chat',
+    )
     parser.set_defaults(interactive_mode=True, task='self_chat')
     WorldLogger.add_cmdline_args(parser)
     return parser
@@ -86,15 +92,22 @@ def _run_self_chat_episode(opt, world, world_logger):
 
 def self_chat(opt):
     random.seed(opt['seed'])
+    partner = opt['partner']
 
     # Create agents
     agent1 = create_agent(opt, requireModelExists=True)
-    agent2 = agent1.clone()
-
-    # Set IDs
     model_id = agent1.id
-    agent1.id = model_id + "_1"
-    agent2.id = model_id + "_2"
+    if partner:
+        # self chat with different models
+        opt['model_file'] = partner
+        agent2 = create_agent(opt, requireModelExists=True)
+        model_id = agent1.id + "_" + agent2.id
+    else:
+        # self chat with same model
+        agent2 = agent1.clone()
+        # Set IDs
+        agent1.id = agent1.id + "_1"
+        agent2.id = agent1.id + "_2"
 
     world = create_task(opt, user_agents=[agent1, agent2])
 
