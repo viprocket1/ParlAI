@@ -61,8 +61,8 @@ def setup_args(parser=None):
         help='Format to save logs in. conversations is a jsonl format, parlai is a text format.',
     )
     parser.add_argument(
-        '-p',
-        '--partner',
+        '-pmf',
+        '--partner-model-file',
         default=None,
         help='Define a different partner for self chat',
     )
@@ -92,7 +92,7 @@ def _run_self_chat_episode(opt, world, world_logger):
 
 def self_chat(opt):
     random.seed(opt['seed'])
-    partner = opt['partner']
+    partner = opt['partner_model_file']
 
     # Create agents
     agent1 = create_agent(opt, requireModelExists=True)
