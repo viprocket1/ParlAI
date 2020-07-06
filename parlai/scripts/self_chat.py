@@ -112,7 +112,7 @@ def self_chat(opt):
             print(f"WARNING: Loading model with opts from {partner_opt_file}")
             with open(partner_opt_file) as f:
                 partner_opt = json.load(f)
-            for k, v in partner_opt.items(): # override partner opts
+            for k, v in partner_opt.items():  # override partner opts
                 opt[k] = v
 
         opt['model_file'] = partner
