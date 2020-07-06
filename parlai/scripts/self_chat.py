@@ -15,6 +15,7 @@ from parlai.scripts.script import ParlaiScript
 import parlai.utils.logging as logging
 
 import math
+import json
 import random
 
 
@@ -66,6 +67,11 @@ def setup_args(parser=None):
         default=None,
         help='Define a different partner for self chat',
     )
+    parser.add_argument(
+        '--partner-opt-file',
+        default=None,
+        help='Path to file containing opts for partner',
+    )
     parser.set_defaults(interactive_mode=True, task='self_chat')
     WorldLogger.add_cmdline_args(parser)
     return parser
@@ -93,21 +99,30 @@ def _run_self_chat_episode(opt, world, world_logger):
 def self_chat(opt):
     random.seed(opt['seed'])
     partner = opt['partner_model_file']
+    partner_opt_file = opt['partner_opt_file']
 
     # Create agents
     agent1 = create_agent(opt, requireModelExists=True)
-    model_id = agent1.id
-    if partner:
-        # self chat with different models
+    if not partner:
+        # Self chat with same model
+        agent2 = agent1.clone()
+    else:
+        # Self chat with different models
+        if partner_opt_file:
+            print(f"WARNING: Loading model with opts from {partner_opt_file}")
+            with open(partner_opt_file) as f:
+                partner_opt = json.load(f)
+            for k, v in partner_opt.items(): # override partner opts
+                opt[k] = v
+
         opt['model_file'] = partner
         agent2 = create_agent(opt, requireModelExists=True)
-        model_id = agent1.id + "_" + agent2.id
-    else:
-        # self chat with same model
-        agent2 = agent1.clone()
-        # Set IDs
-        agent1.id = model_id + "_1"
-        agent2.id = model_id + "_2"
+
+    # Set IDs
+    agent1.id = agent1.id + "_1"
+    agent2.id = agent2.id + "_2"
+
+    model_id = agent1.id + "_" + agent2.id
 
     world = create_task(opt, user_agents=[agent1, agent2])
 
