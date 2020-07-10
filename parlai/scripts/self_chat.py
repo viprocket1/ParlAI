@@ -7,7 +7,7 @@
 Allows a model to self-chat on a given task.
 """
 from parlai.core.params import ParlaiParser
-from parlai.core.agents import create_agent
+from parlai.core.agents import create_agent, create_agent_from_model_file
 from parlai.core.worlds import create_task
 from parlai.utils.world_logging import WorldLogger
 from parlai.utils.misc import TimeLogger
@@ -70,7 +70,7 @@ def setup_args(parser=None):
     parser.add_argument(
         '--partner-opt-file',
         default=None,
-        help='Path to file containing opts for partner',
+        help='Path to file containing opts to override for partner',
     )
     parser.set_defaults(interactive_mode=True, task='self_chat')
     WorldLogger.add_cmdline_args(parser)
@@ -109,14 +109,12 @@ def self_chat(opt):
     else:
         # Self chat with different models
         if partner_opt_file:
-            print(f"WARNING: Loading model with opts from {partner_opt_file}")
+            print(f"WARNING: Loading override opts from: {partner_opt_file}")
             with open(partner_opt_file) as f:
                 partner_opt = json.load(f)
-            for k, v in partner_opt.items():  # override partner opts
-                opt[k] = v
 
-        opt['model_file'] = partner
-        agent2 = create_agent(opt, requireModelExists=True)
+        partner_opt['interactive_mode'] = opt['interactive_mode']
+        agent2 = create_agent_from_model_file(partner, partner_opt)
 
     # Set IDs
     agent1.id = agent1.id + "_1"
