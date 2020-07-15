@@ -113,7 +113,9 @@ def self_chat(opt):
             with open(partner_opt_file) as f:
                 partner_opt = json.load(f)
 
-        print(f"WARNING: setting partners interactive mode to {opt['interactive_mode']}")
+        print(
+            f"WARNING: Setting partner interactive mode to: {opt['interactive_mode']}"
+        )
         partner_opt['interactive_mode'] = opt['interactive_mode']
         agent2 = create_agent_from_model_file(partner, partner_opt)
 
